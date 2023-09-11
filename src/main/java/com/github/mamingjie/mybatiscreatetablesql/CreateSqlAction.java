@@ -1,4 +1,4 @@
-package com.github.mamingjie.mybatisgeneratetablesql;
+package com.github.mamingjie.mybatiscreatetablesql;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -14,14 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CreateSqlAction extends AnAction {
-
-    /**
-     * @author Howe
-     * @Description 将驼峰转为下划线，正则式
-     * @param str  例如：helloWord
-     * @return java.lang.String
-     * underline:下划线，驼峰：hump
-     */
     public static Pattern compile = Pattern.compile("[A-Z]");
 
     public static String underlineByHump(String str) {
@@ -72,15 +64,11 @@ public class CreateSqlAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getData(PlatformDataKeys.PROJECT);
         // Messages.showMessageDialog(project,"Hello,World","First Action", Messages.getInformationIcon());
-        // 创建GUI对象
         CreateSqlGenerateForm testDialog = new CreateSqlGenerateForm();
-        // 构建对话框
         DialogBuilder dialogBuilder = new DialogBuilder(project);
-        // 设置对话框显示内容
         dialogBuilder.setCenterPanel(testDialog.getRootPanel());
         dialogBuilder.setTitle("Create Sql");
 
-        // 获取当前文件对象
         Editor editor = e.getData(PlatformDataKeys.EDITOR);
         if (editor == null || project == null) {
             dialogBuilder.show();
@@ -92,7 +80,6 @@ public class CreateSqlAction extends AnAction {
             return;
         }
         StringBuilder sql = new StringBuilder();
-        // 遍历当前对象的所有属性
         for (PsiElement psiElement : psiFile.getChildren()) {
             System.out.println(psiElement);
             PsiAnnotation annotation;
@@ -189,7 +176,6 @@ public class CreateSqlAction extends AnAction {
             }
         }
         testDialog.setCodeContentText(sql.toString());
-        // 显示对话框
         dialogBuilder.show();
     }
 

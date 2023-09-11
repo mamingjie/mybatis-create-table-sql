@@ -1,8 +1,13 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.mamingjie.mybatisgeneratetablesql</id>
-    <name>Mybatis-Generate-Table-Sql</name>
+    <id>com.github.mamingjie.mybatiscreatetablesql</id>
+    <name>Mybatis-Create-Table-Sql</name>
     <vendor>mamingjie</vendor>
+
+    <description><![CDATA[
+    <h3>Mybatis-Generate-Table-Sql</h3>
+    <p>this is a plugin to generate mysql create table sql from mybatis definition bean.
+    ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.platform</depends>
@@ -10,8 +15,8 @@
     <depends>com.intellij.modules.java</depends>
 
     <actions>
-        <action id="com.github.mamingjie.mybatisgeneratetablesql.CreateSqlAction"
-                class="com.github.mamingjie.mybatisgeneratetablesql.CreateSqlAction"
+        <action id="com.github.mamingjie.mybatiscreatetablesql.CreateSqlAction"
+                class="com.github.mamingjie.mybatiscreatetablesql.CreateSqlAction"
                 text="生成建表语句" description="生成建表语句">
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>

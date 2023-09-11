@@ -1,1 +1,1 @@
-rootProject.name = "code-generator"
+rootProject.name = "mybatis-create-table-sql"

@@ -1,4 +1,4 @@
-package com.github.mamingjie.mybatisgeneratetablesql;
+package com.github.mamingjie.mybatiscreatetablesql;
 
 import javax.swing.*;
 
