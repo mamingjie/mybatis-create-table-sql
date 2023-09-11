@@ -1,4 +1,6 @@
-# code-generator
+# mybatis-generate-table-sql
+
+mybatis实体类生成建表语句
 
 ![Build](https://github.com/mamingjie/code-generator/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
