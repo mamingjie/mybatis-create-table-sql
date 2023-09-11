@@ -116,6 +116,9 @@ public class CreateSqlAction extends AnAction {
                 PsiField[] fields = psiClass.getAllFields();
                 String primaryKey = null;
                 for (PsiField field : fields) {
+                    if (field.getModifierList() != null && field.getModifierList().hasExplicitModifier(PsiModifier.STATIC)) {
+                        continue;
+                    }
                     String fieldName = underlineByHump(field.getName());
                     String fieldType;
                     String fieldComment = null;
