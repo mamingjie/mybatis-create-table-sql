@@ -1,4 +1,4 @@
-package com.github.mamingjie.codegenerator;
+package com.github.mamingjie.mybatisgeneratetablesql;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;

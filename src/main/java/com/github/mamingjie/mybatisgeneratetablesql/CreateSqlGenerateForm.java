@@ -1,4 +1,4 @@
-package com.github.mamingjie.codegenerator;
+package com.github.mamingjie.mybatisgeneratetablesql;
 
 import javax.swing.*;
 
