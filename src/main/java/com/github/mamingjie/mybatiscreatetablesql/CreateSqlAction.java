@@ -158,7 +158,7 @@ public class CreateSqlAction extends AnAction {
                         }
                         fieldType = getFieldType(field.getType(), fieldName);
                         sql.append("    `").append(fieldName).append("` ").append(fieldType);
-                        if ("tinyint".equals(fieldType)) {
+                        if ("tinyint(1)".equals(fieldType)) {
                             sql.append(" default 0");
                         }
                         if ("createTime".equals(field.getName())) {
