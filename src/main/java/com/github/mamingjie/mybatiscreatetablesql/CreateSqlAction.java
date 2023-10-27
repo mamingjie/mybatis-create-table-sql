@@ -28,7 +28,11 @@ public class CreateSqlAction extends AnAction {
     }
 
     public static String getStringValue(PsiAnnotationMemberValue annotationValue) {
-        return annotationValue.getText().replaceAll("[\"`]", "");
+        if (annotationValue == null) {
+            return null;
+        }
+        String value = annotationValue.getText().replaceAll("[\"`]", "");
+        return value.isEmpty() ? null : value;
     }
 
     public static String getFieldType(PsiType psiType, String fieldName) {
@@ -37,6 +41,8 @@ public class CreateSqlAction extends AnAction {
             switch (className) {
                 case "Integer":
                     return endsWithAny(fieldName.toLowerCase(), "status", "type") ? "tinyint(1)" : "int";
+                case "Boolean":
+                    return "tinyint(1)";
                 case "Long":
                     return "bigint";
                 case "BigDecimal":
@@ -84,13 +90,15 @@ public class CreateSqlAction extends AnAction {
             System.out.println(psiElement);
             PsiAnnotation annotation;
             PsiAnnotationMemberValue annotationValue;
+            String annotationStringValue;
             if (psiElement instanceof PsiClass psiClass) {
                 annotation = psiClass.getAnnotation("com.baomidou.mybatisplus.annotation.TableName");
                 String tableName = null;
                 if (annotation != null) {
                     annotationValue = annotation.findAttributeValue("value");
-                    if (annotationValue != null) {
-                        tableName = getStringValue(annotationValue);
+                    annotationStringValue = getStringValue(annotationValue);
+                    if (annotationStringValue != null) {
+                        tableName = annotationStringValue;
                     }
                 }
                 if (tableName == null) {
@@ -101,12 +109,14 @@ public class CreateSqlAction extends AnAction {
                 String tableComment = null;
                 if (annotation != null) {
                     annotationValue = annotation.findAttributeValue("description");
-                    if (annotationValue != null) {
-                        tableComment = getStringValue(annotationValue);
+                    annotationStringValue = getStringValue(annotationValue);
+                    if (annotationStringValue != null) {
+                        tableComment = annotationStringValue;
                     } else {
                         annotationValue = annotation.findAttributeValue("value");
-                        if (annotationValue != null) {
-                            tableComment = getStringValue(annotationValue);
+                        annotationStringValue = getStringValue(annotationValue);
+                        if (annotationStringValue != null) {
+                            tableComment = annotationStringValue;
                         }
                     }
                 }
@@ -125,20 +135,23 @@ public class CreateSqlAction extends AnAction {
                     annotation = field.getAnnotation("io.swagger.annotations.ApiModelProperty");
                     if (annotation != null) {
                         annotationValue = annotation.findAttributeValue("value");
-                        if (annotationValue != null) {
-                            fieldComment = getStringValue(annotationValue);
+                        annotationStringValue = getStringValue(annotationValue);
+                        if (annotationStringValue != null) {
+                            fieldComment = annotationStringValue;
                         }
                     }
                     annotation = field.getAnnotation("com.baomidou.mybatisplus.annotation.TableId");
                     if (annotation != null) {
                         annotationValue = annotation.findAttributeValue("value");
-                        if (annotationValue != null) {
-                            fieldName = getStringValue(annotationValue);
+                        annotationStringValue = getStringValue(annotationValue);
+                        if (annotationStringValue != null) {
+                            fieldName = annotationStringValue;
                         }
                         fieldType = getFieldType(field.getType(), fieldName);
                         primaryKey = fieldName;
                         annotationValue = annotation.findAttributeValue("type");
-                        boolean autoIncrement = annotationValue != null && getStringValue(annotationValue).contains("AUTO");
+                        annotationStringValue = getStringValue(annotationValue);
+                        boolean autoIncrement = annotationStringValue != null && annotationStringValue.contains("AUTO");
                         sql.append("    `").append(fieldName).append("` ").append(fieldType).append(" not null");
                         if (autoIncrement) {
                             sql.append(" auto_increment");
@@ -148,12 +161,14 @@ public class CreateSqlAction extends AnAction {
                         annotation = field.getAnnotation("com.baomidou.mybatisplus.annotation.TableField");
                         if (annotation != null) {
                             annotationValue = annotation.findAttributeValue("exist");
-                            if (annotationValue != null && "false".equals(getStringValue(annotationValue))) {
+                            annotationStringValue = getStringValue(annotationValue);
+                            if ("false".equals(annotationStringValue)) {
                                 continue;
                             }
                             annotationValue = annotation.findAttributeValue("value");
-                            if (annotationValue != null) {
-                                fieldName = getStringValue(annotationValue);
+                            annotationStringValue = getStringValue(annotationValue);
+                            if (annotationStringValue != null) {
+                                fieldName = annotationStringValue;
                             }
                         }
                         fieldType = getFieldType(field.getType(), fieldName);
