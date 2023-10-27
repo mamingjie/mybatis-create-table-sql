@@ -15,7 +15,7 @@
           </grid>
         </constraints>
         <properties>
-          <font size="14"/>
+          <font name="Consolas" size="14"/>
           <text value=""/>
         </properties>
       </component>
