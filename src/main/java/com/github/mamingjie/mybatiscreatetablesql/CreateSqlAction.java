@@ -104,21 +104,18 @@ public class CreateSqlAction extends AnAction {
                 if (tableName == null) {
                     tableName = underlineByHump(psiClass.getName());
                 }
+                sql.append("drop table if exists `").append(tableName).append("`;\n");
                 sql.append("create table `").append(tableName).append("` (\n");
-                annotation = psiClass.getAnnotation("io.swagger.annotations.ApiModel");
                 String tableComment = null;
-                if (annotation != null) {
-                    annotationValue = annotation.findAttributeValue("description");
-                    annotationStringValue = getStringValue(annotationValue);
-                    if (annotationStringValue != null) {
-                        tableComment = annotationStringValue;
-                    } else {
-                        annotationValue = annotation.findAttributeValue("value");
-                        annotationStringValue = getStringValue(annotationValue);
-                        if (annotationStringValue != null) {
-                            tableComment = annotationStringValue;
-                        }
-                    }
+                annotation = psiClass.getAnnotation("io.swagger.annotations.ApiModel");
+                annotationStringValue = getAnnotationValue(annotation, "description", "value");
+                if (annotationStringValue != null) {
+                    tableComment = annotationStringValue;
+                }
+                annotation = psiClass.getAnnotation("io.swagger.v3.oas.annotations.media.Schema");
+                annotationStringValue = getAnnotationValue(annotation, "description", "name", "title");
+                if (annotationStringValue != null) {
+                    tableComment = annotationStringValue;
                 }
                 if (tableComment == null) {
                     tableComment = psiClass.getName();
@@ -133,12 +130,14 @@ public class CreateSqlAction extends AnAction {
                     String fieldType;
                     String fieldComment = null;
                     annotation = field.getAnnotation("io.swagger.annotations.ApiModelProperty");
-                    if (annotation != null) {
-                        annotationValue = annotation.findAttributeValue("value");
-                        annotationStringValue = getStringValue(annotationValue);
-                        if (annotationStringValue != null) {
-                            fieldComment = annotationStringValue;
-                        }
+                    annotationStringValue = getAnnotationValue(annotation, "value");
+                    if (annotationStringValue != null) {
+                        fieldComment = annotationStringValue;
+                    }
+                    annotation = field.getAnnotation("io.swagger.v3.oas.annotations.media.Schema");
+                    annotationStringValue = getAnnotationValue(annotation, "description", "name", "title");
+                    if (annotationStringValue != null) {
+                        fieldComment = annotationStringValue;
                     }
                     annotation = field.getAnnotation("com.baomidou.mybatisplus.annotation.TableId");
                     if (annotation != null) {
@@ -195,6 +194,20 @@ public class CreateSqlAction extends AnAction {
         }
         testDialog.setCodeContentText(sql.toString());
         dialogBuilder.show();
+    }
+
+    private String getAnnotationValue(PsiAnnotation annotation, String... keys) {
+        if (annotation == null) {
+            return null;
+        }
+        for (String key : keys) {
+            PsiAnnotationMemberValue annotationValue = annotation.findAttributeValue(key);
+            String annotationStringValue = getStringValue(annotationValue);
+            if (annotationStringValue != null) {
+                return annotationStringValue;
+            }
+        }
+        return null;
     }
 
 }
