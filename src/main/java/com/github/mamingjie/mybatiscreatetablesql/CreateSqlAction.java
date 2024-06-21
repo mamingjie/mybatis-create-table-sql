@@ -73,7 +73,7 @@ public class CreateSqlAction extends AnAction {
         CreateSqlGenerateForm testDialog = new CreateSqlGenerateForm();
         DialogBuilder dialogBuilder = new DialogBuilder(project);
         dialogBuilder.setCenterPanel(testDialog.getRootPanel());
-        dialogBuilder.setTitle("Create Sql");
+        dialogBuilder.setTitle("建表语句");
 
         Editor editor = e.getData(PlatformDataKeys.EDITOR);
         if (editor == null || project == null) {
@@ -85,9 +85,9 @@ public class CreateSqlAction extends AnAction {
             dialogBuilder.show();
             return;
         }
-        StringBuilder sql = new StringBuilder();
+        StringBuilder createSql = new StringBuilder();
+        StringBuilder modifySql = new StringBuilder();
         for (PsiElement psiElement : psiFile.getChildren()) {
-            System.out.println(psiElement);
             PsiAnnotation annotation;
             PsiAnnotationMemberValue annotationValue;
             String annotationStringValue;
@@ -104,8 +104,8 @@ public class CreateSqlAction extends AnAction {
                 if (tableName == null) {
                     tableName = underlineByHump(psiClass.getName());
                 }
-                sql.append("drop table if exists `").append(tableName).append("`;\n");
-                sql.append("create table `").append(tableName).append("` (\n");
+                createSql.append("drop table if exists `").append(tableName).append("`;\n\n\n");
+                createSql.append("create table `").append(tableName).append("` (\n");
                 String tableComment = null;
                 annotation = psiClass.getAnnotation("io.swagger.annotations.ApiModel");
                 annotationStringValue = getAnnotationValue(annotation, "description", "value");
@@ -126,6 +126,7 @@ public class CreateSqlAction extends AnAction {
                     if (field.getModifierList() != null && field.getModifierList().hasExplicitModifier(PsiModifier.STATIC)) {
                         continue;
                     }
+                    StringBuilder fieldSql = new StringBuilder();
                     String fieldName = underlineByHump(field.getName());
                     String fieldType;
                     String fieldComment = null;
@@ -151,11 +152,11 @@ public class CreateSqlAction extends AnAction {
                         annotationValue = annotation.findAttributeValue("type");
                         annotationStringValue = getStringValue(annotationValue);
                         boolean autoIncrement = annotationStringValue != null && annotationStringValue.contains("AUTO");
-                        sql.append("    `").append(fieldName).append("` ").append(fieldType).append(" not null");
+                        fieldSql.append("    `").append(fieldName).append("` ").append(fieldType).append(" not null");
                         if (autoIncrement) {
-                            sql.append(" auto_increment");
+                            fieldSql.append(" auto_increment");
                         }
-                        sql.append(" comment '").append(fieldComment == null ? field.getName() : fieldComment).append("',\n");
+                        fieldSql.append(" comment '").append(fieldComment == null ? field.getName() : fieldComment).append("',\n");
                     } else {
                         annotation = field.getAnnotation("com.baomidou.mybatisplus.annotation.TableField");
                         if (annotation != null) {
@@ -171,28 +172,30 @@ public class CreateSqlAction extends AnAction {
                             }
                         }
                         fieldType = getFieldType(field.getType(), fieldName);
-                        sql.append("    `").append(fieldName).append("` ").append(fieldType);
+                        fieldSql.append("    `").append(fieldName).append("` ").append(fieldType);
                         if ("tinyint(1)".equals(fieldType)) {
-                            sql.append(" default 0");
+                            fieldSql.append(" default 0");
                         }
                         if ("createTime".equals(field.getName())) {
-                            sql.append(" default current_timestamp");
+                            fieldSql.append(" default current_timestamp");
                         }
                         if ("updateTime".equals(field.getName())) {
-                            sql.append(" default current_timestamp on update current_timestamp");
+                            fieldSql.append(" default current_timestamp on update current_timestamp");
                         }
-                        sql.append(" comment '").append(fieldComment == null ? field.getName() : fieldComment).append("',\n");
+                        fieldSql.append(" comment '").append(fieldComment == null ? field.getName() : fieldComment).append("'");
                     }
+                    createSql.append(fieldSql).append(",\n");
+                    modifySql.append("alter table `").append(tableName).append("` add column").append(fieldSql).append(";\n\n");
                 }
                 if (primaryKey != null) {
-                    sql.append("    primary key (`").append(primaryKey).append("`)\n");
+                    createSql.append("    primary key (`").append(primaryKey).append("`)\n");
                 } else {
-                    sql.deleteCharAt(sql.length() - 2);
+                    createSql.deleteCharAt(createSql.length() - 2);
                 }
-                sql.append(") comment '").append(tableComment).append("';");
+                createSql.append(") comment '").append(tableComment).append("';\n\n\n").append(modifySql);
             }
         }
-        testDialog.setCodeContentText(sql.toString());
+        testDialog.setCodeContentText(createSql.toString());
         dialogBuilder.show();
     }
 
