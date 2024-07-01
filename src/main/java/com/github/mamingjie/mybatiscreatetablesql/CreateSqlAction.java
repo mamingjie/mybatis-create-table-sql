@@ -156,7 +156,7 @@ public class CreateSqlAction extends AnAction {
                         if (autoIncrement) {
                             fieldSql.append(" auto_increment");
                         }
-                        fieldSql.append(" comment '").append(fieldComment == null ? field.getName() : fieldComment).append("',\n");
+                        fieldSql.append(" comment '").append(fieldComment == null ? field.getName() : fieldComment).append("'");
                     } else {
                         annotation = field.getAnnotation("com.baomidou.mybatisplus.annotation.TableField");
                         if (annotation != null) {
